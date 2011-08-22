@@ -51,7 +51,7 @@ Something like this:
 				'delete' => $this->_generate_link('DELETE', '/api/jobs/:id', array(
 					':id' => 'id',
 				)),
-				'owner'   => $this->_generate_link('DELETE', '/api/user/:id', array(
+				'owner'   => $this->_generate_link('GET',   '/api/user/:id', array(
 					':id' => 'id',
 				)),
 			);
@@ -198,7 +198,7 @@ Something like this:
 				}
 			},
 			"owner": {
-				"method": "DELETE",
+				"method": "GET",
 				"url": "\/api\/user\/:id",
 				"parameters": {
 					":id": "id"
