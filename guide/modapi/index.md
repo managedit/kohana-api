@@ -162,3 +162,77 @@ Something like this:
 			}
 		}
 	}
+
+## Example resource output:
+
+	{
+		"metadata": {
+			"error": false,
+			"sample": "data"
+		},
+		"links": {
+			"create": {
+				"method": "POST",
+				"url": "\/api\/jobs",
+				"parameters": []
+			},
+			"read": {
+				"method": "GET",
+				"url": "\/api\/jobs\/:id",
+				"parameters": {
+					":id": "id"
+				}
+			},
+			"update": {
+				"method": "PUT",
+				"url": "\/api\/jobs\/:id",
+				"parameters": {
+					":id": "id"
+				}
+			},
+			"delete": {
+				"method": "DELETE",
+				"url": "\/api\/jobs\/:id",
+				"parameters": {
+					":id": "id"
+				}
+			},
+			"owner": {
+				"method": "DELETE",
+				"url": "\/api\/user\/:id",
+				"parameters": {
+					":id": "id"
+				}
+			}
+		},
+		"payload": {
+			"id": "3",
+			"company_id": "2",
+			"name": "Job 2",
+			"created": "1314043166",
+			"updated": null
+		}
+	}
+
+## Example collection output:
+
+{
+    "metadata": {
+        "error": false,
+        "test": "test"
+    },
+    "links": [],
+    "payload": [{
+        "id": "2",
+        "company_id": "1",
+        "name": "Job 1",
+        "created": "1314043166",
+        "updated": null
+    }, {
+        "id": "3",
+        "company_id": "2",
+        "name": "Job 2",
+        "created": "1314043166",
+        "updated": null
+    }]
+}
