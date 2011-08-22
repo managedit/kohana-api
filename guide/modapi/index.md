@@ -216,23 +216,23 @@ Something like this:
 
 ## Example collection output:
 
-{
-    "metadata": {
-        "error": false,
-        "test": "test"
-    },
-    "links": [],
-    "payload": [{
-        "id": "2",
-        "company_id": "1",
-        "name": "Job 1",
-        "created": "1314043166",
-        "updated": null
-    }, {
-        "id": "3",
-        "company_id": "2",
-        "name": "Job 2",
-        "created": "1314043166",
-        "updated": null
-    }]
-}
+	{
+		"metadata": {
+			"error": false,
+			"test": "test"
+		},
+		"links": [],
+		"payload": [{
+			"id": "2",
+			"company_id": "1",
+			"name": "Job 1",
+			"created": "1314043166",
+			"updated": null
+		}, {
+			"id": "3",
+			"company_id": "2",
+			"name": "Job 2",
+			"created": "1314043166",
+			"updated": null
+		}]
+	}
