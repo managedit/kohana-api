@@ -219,7 +219,7 @@ abstract class Controller_API extends OAuth2_Controller
 				'code'    => $e->getCode(),
 			);
 
-			$this->_response_links = NULL;
+			$this->_response_links = array();
 		}
 	}
 
