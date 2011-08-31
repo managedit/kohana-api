@@ -31,30 +31,53 @@ abstract class Controller_API_ORM extends Controller_API {
 			'type' => $this->_model_name,
 		);
 
-		$this->_response_links += array(
-			'create' => $this->_generate_link('POST', Route::url('api', array(
-				'controller' => $this->request->controller(),
-				'id'         => NULL,
-			))),
-			'read' => $this->_generate_link('GET', Route::url('api', array(
-				'controller' => $this->request->controller(),
-				'id'         => $this->request->param('id'),
-			)), array(
-				':id' => 'id',
-			)),
-			'update' => $this->_generate_link('PUT', Route::url('api', array(
-				'controller' => $this->request->controller(),
-				'id'         => $this->request->param('id'),
-			)), array(
-				':id' => 'id',
-			)),
-			'delete' => $this->_generate_link('DELETE', Route::url('api', array(
-				'controller' => $this->request->controller(),
-				'id'         => $this->request->param('id'),
-			)), array(
-				':id' => 'id',
-			)),
-		);
+//		$this->_response_links += array(
+//			'create' => $this->_generate_link('POST', Route::url('api', array(
+//				'controller' => $this->request->controller(),
+//				'id'         => NULL,
+//			), TRUE)),
+//			'read' => $this->_generate_link('GET', Route::url('api', array(
+//				'controller' => $this->request->controller(),
+//				'id'         => ':id',
+//			), TRUE), array(
+//				':id' => 'id',
+//			)),
+//			'update' => $this->_generate_link('PUT', Route::url('api', array(
+//				'controller' => $this->request->controller(),
+//				'id'         => ':id',
+//			), TRUE), array(
+//				':id' => 'id',
+//			)),
+//			'delete' => $this->_generate_link('DELETE', Route::url('api', array(
+//				'controller' => $this->request->controller(),
+//				'id'         => ':id',
+//			), TRUE), array(
+//				':id' => 'id',
+//			)),
+//		);
+
+		$model = ORM::factory($this->_model_name);
+
+		// Add links for has_many relations
+		foreach ($model->has_many() as $name => $opts)
+		{
+			$this->_response_links[$name] = $this->_generate_link('GET', Route::url('api', array(
+				'controller' => Inflector::plural($opts['model']),
+			), TRUE).'?where.'.$opts['foreign_key'].'.eq=:'.$opts['foreign_key'], array(
+				':'.$opts['foreign_key'] => 'id',
+			));
+		}
+
+		// Add links for belongs_to relations
+		foreach ($model->belongs_to() as $name => $opts)
+		{
+			$this->_response_links[$name] = $this->_generate_link('GET', Route::url('api', array(
+				'controller' => Inflector::plural($opts['model']),
+				'id'         => ':id',
+			), TRUE), array(
+				':id' => $opts['foreign_key'],
+			));
+		}
 
 		parent::after();
 	}
@@ -100,6 +123,9 @@ abstract class Controller_API_ORM extends Controller_API {
 		$model = ORM::factory($this->_model_name);
 
 		// Apply filters
+		$query = $this->request->query();
+
+		$model = $this->_apply_filters($model, $query);
 
 		$cmodel = clone $model;
 
@@ -200,4 +226,39 @@ abstract class Controller_API_ORM extends Controller_API {
 		}
 	}
 
+	protected function _apply_filters($model, $params)
+	{
+		foreach ($params as $name => $value)
+		{
+			if (strpos($name, 'where.') !== FALSE)
+			{
+				$parts = explode('.', $name);
+
+				$column = $parts[1];
+				$condition = $parts[2];
+
+				switch ($condition)
+				{
+					case 'eq': // Equals
+						$model->where($column, '=', $value);
+						break;
+					case 'lk': // Like
+						$model->where($column, 'LIKE', $value);
+						break;
+					case 'lt': // Less Than
+						$model->where($column, '<', $value);
+						break;
+					case 'gt': // Greater Than
+						$model->where($column, '>', $value);
+						break;
+					default:
+						throw new HTTP_Exception_400('Unknown where condition \':condition\'', array(
+							':condition' => $condition,
+						));
+				}
+			}
+		}
+
+		return $model;
+	}
 }
