@@ -223,11 +223,12 @@ abstract class Controller_API extends OAuth2_Controller
 		}
 	}
 
-	protected function _generate_link($method, $uri, $parameters = NULL)
+	protected function _generate_link($method, $uri, $type, $parameters = NULL)
 	{
 		$link = array(
 			'method'     => $method,
 			'url'        => $uri,
+			'type'       => $type,
 			'parameters' => array(),
 		);
 
