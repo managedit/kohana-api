@@ -14,7 +14,7 @@ abstract class Kohana_Controller_API extends OAuth2_Controller
 	/**
 	 * @var array Response Metadata
 	 */
-	protected $_response_metadata = array('error' => FALSE);
+	protected $_response_metadata = array('error' => FALSE, 'collection' => FALSE);
 
 	/**
 	 * @var array Response Links
@@ -205,6 +205,48 @@ abstract class Kohana_Controller_API extends OAuth2_Controller
 		{
 			$this->{$action}();
 		}
+		catch (ORM_Validation_Exception $e)
+		{
+			$this->response->status(400);
+
+			$this->_response_metadata = array(
+				'error' => TRUE,
+				'type'  => 'validation_exception',
+			);
+
+			$this->_response_links = array();
+
+			$this->_response_payload = array('errors' => $e->errors('model'));
+		}
+		catch (Database_Exception $e)
+		{
+			$this->response->status(500);
+
+			$this->_response_metadata = array(
+				'error' => TRUE,
+				'type' => 'database_exception',
+			);
+
+			if ($e->getCode() == 1451)
+			{
+				// FK Constraint
+				$this->_response_payload = array(
+					'message' => 'Unable to remove record while it still has dependencies. Please remove all dependencies and try again.',
+					'detail'  => $e->getMessage(),
+					'code'    => $e->getCode(),
+				);
+			}
+			else
+			{
+				$this->_response_payload = array(
+					'message' => 'An unknown database error has occoured. Please try again later.',
+					'detail'  => $e->getMessage(),
+					'code'    => $e->getCode(),
+				);
+			}
+
+			$this->_response_links = array();
+		}
 		catch (HTTP_Exception $e)
 		{
 			$this->response->status($e->getCode());
@@ -220,6 +262,22 @@ abstract class Kohana_Controller_API extends OAuth2_Controller
 			);
 
 			$this->_response_links = array();
+		}
+		catch (Policy_Exception $e)
+		{
+			$this->response->status(403);
+
+			$this->_response_metadata = array(
+				'error' => TRUE,
+				'type'  => 'policy_exception',
+			);
+
+			$this->_response_links = array();
+
+			$this->_response_payload = array(
+				'message' => $e->getMessage(),
+				'code'    => $e->getCode(),
+			);
 		}
 		catch (Exception $e)
 		{
