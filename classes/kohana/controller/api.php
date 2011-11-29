@@ -30,6 +30,7 @@ abstract class Kohana_Controller_API extends OAuth2_Controller
 		Http_Request::GET    => 'get',
 		Http_Request::PUT    => 'put',    // Typically Update..
 		Http_Request::DELETE => 'delete',
+		'PATCH'              => 'patch',
 	);
 
 	/**
@@ -39,6 +40,7 @@ abstract class Kohana_Controller_API extends OAuth2_Controller
 	(
 		Http_Request::POST,
 		Http_Request::PUT,
+		'PATCH'
 	);
 
 	/**
